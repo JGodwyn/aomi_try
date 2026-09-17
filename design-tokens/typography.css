@@ -1,0 +1,48 @@
+/**
+ * Source: design-sync/_file-context/typography.json
+ */
+:root {
+  --font-display: "PT Serif", serif;
+  --font-body: Geist, sans-serif;
+
+  --display-lg: 700 83px / 104px var(--font-display);
+  --display-lg-letter-spacing: -0.02em;
+  --display-md: 700 67px / 84px var(--font-display);
+  --display-md-letter-spacing: -0.02em;
+  --display-sm: 700 53px / 68px var(--font-display);
+  --display-sm-letter-spacing: -0.02em;
+
+  --heading-lg: 700 43px / 56px var(--font-display);
+  --heading-lg-letter-spacing: -0.02em;
+  --heading-md: 400 34px / 44px var(--font-display);
+  --heading-md-letter-spacing: -0.02em;
+  --heading-sm: 400 27px / 36px var(--font-display);
+  --heading-sm-letter-spacing: -0.02em;
+
+  --title-lg: 400 22px / 28px var(--font-display);
+  --title-lg-letter-spacing: -0.02em;
+  --title-md: 400 17px / 24px var(--font-display);
+  --title-md-letter-spacing: -0.02em;
+  --title-sm: 400 14px / 20px var(--font-display);
+  --title-sm-letter-spacing: -0.02em;
+
+  --body-lg: 500 16px / 24px var(--font-body);
+  --body-lg-letter-spacing: -0.01em;
+  --body-lg-bold: 700 16px / 24px var(--font-body);
+  --body-lg-bold-letter-spacing: -0.01em;
+  --body-md: 500 14px / 20px var(--font-body);
+  --body-md-letter-spacing: -0.01em;
+  --body-md-bold: 700 14px / 20px var(--font-body);
+  --body-md-bold-letter-spacing: -0.01em;
+  --body-sm: 500 10px / 12px var(--font-body);
+  --body-sm-letter-spacing: -0.01em;
+  --body-sm-bold: 700 10px / 12px var(--font-body);
+  --body-sm-bold-letter-spacing: -0.01em;
+
+  --btn-lg: 600 16px / 20px var(--font-body);
+  --btn-lg-letter-spacing: 0;
+  --btn-sm: 600 14px / 16px var(--font-body);
+  --btn-sm-letter-spacing: 0;
+  --link: 400 14px / 20px var(--font-body);
+  --link-letter-spacing: 0;
+}

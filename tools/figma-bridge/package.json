@@ -1,0 +1,21 @@
+{
+  "name": "figma-bridge",
+  "version": "0.2.0",
+  "description": "Get Figma designs into any repo without the rate-limited REST API or MCP server — a private Figma plugin + localhost bridge writing frame exports and file context to design-sync/.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "figma-bridge": "bin/figma-bridge.mjs"
+  },
+  "scripts": {
+    "start": "node bin/figma-bridge.mjs start",
+    "build:plugin": "node bin/figma-bridge.mjs plugin build"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.130.0",
+    "typescript": "^5"
+  }
+}

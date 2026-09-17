@@ -1,0 +1,33 @@
+/**
+ * Source: design-sync/_file-context/variables.json
+ * Collection: ColorBox Colors (Light)
+ */
+:root {
+  --color-gray-0: #000000;
+  --color-gray-50: #0a0b0d;
+  --color-gray-100: #15171a;
+  --color-gray-200: #2a2e33;
+  --color-gray-300: #40464d;
+  --color-gray-400: #575e66;
+  --color-gray-500: #6e7780;
+  --color-gray-600: #879099;
+  --color-gray-700: #a0a9b3;
+  --color-gray-800: #bac3cc;
+  --color-gray-900: #d4dde6;
+  --color-gray-950: #e2eaf2;
+  --color-gray-1000: #f0f7ff;
+
+  --color-bluenight-0: #000c1a;
+  --color-bluenight-50: #001226;
+  --color-bluenight-100: #001832;
+  --color-bluenight-200: #02254a;
+  --color-bluenight-300: #063362;
+  --color-bluenight-400: #0f437a;
+  --color-bluenight-500: #1d5592;
+  --color-bluenight-600: #326caa;
+  --color-bluenight-700: #5288c2;
+  --color-bluenight-800: #7ea9d7;
+  --color-bluenight-900: #b1ceec;
+  --color-bluenight-950: #cde1f5;
+  --color-bluenight-1000: #ebf4ff;
+}

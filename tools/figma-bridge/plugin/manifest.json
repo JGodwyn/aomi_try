@@ -1,0 +1,14 @@
+{
+  "name": "Figma Bridge",
+  "id": "figma-bridge-dev",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "devAllowedDomains": ["http://localhost:4411"],
+    "reasoning": "Sends exported frame data and file context to a local bridge script that writes it into the current project's repo."
+  }
+}

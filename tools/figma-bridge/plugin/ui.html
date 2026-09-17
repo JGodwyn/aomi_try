@@ -1,0 +1,253 @@
+<style>
+  body {
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 16px;
+    color: #1e1e1e;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #333;
+  }
+  select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 12px;
+    background: #fff;
+    margin-bottom: 8px;
+  }
+  button {
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #0d99ff;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.secondary {
+    background: #f0f0f0;
+    color: #1e1e1e;
+    font-weight: 500;
+    padding: 7px 12px;
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+  button + button:not(.secondary) {
+    margin-top: 8px;
+    background: #f0f0f0;
+    color: #1e1e1e;
+  }
+  button:disabled {
+    background: #b3b3b3;
+    color: #fff;
+    cursor: default;
+  }
+  #status {
+    margin-top: 12px;
+    line-height: 1.5;
+    color: #555;
+    word-break: break-word;
+  }
+  #status.error {
+    color: #c00;
+  }
+</style>
+
+<label for="folder">Export to</label>
+<select id="folder" disabled></select>
+<button id="pick" class="secondary" disabled>Choose folder…</button>
+
+<button id="export" disabled>Export selection</button>
+<button id="context" disabled>Export file context</button>
+<button id="typography" disabled>Export typography styles</button>
+<div id="status">Connecting to bridge…</div>
+
+<script>
+  const BRIDGE = "http://localhost:4411";
+  const exportBtn = document.getElementById("export");
+  const contextBtn = document.getElementById("context");
+  const typographyBtn = document.getElementById("typography");
+  const pickBtn = document.getElementById("pick");
+  const folderSelect = document.getElementById("folder");
+  const status = document.getElementById("status");
+
+  // Identity of the open Figma file (key, or name as fallback) — the server
+  // remembers the chosen export folder per file under this id.
+  let fileId = null;
+  let target = null;
+
+  function setStatus(text, isError) {
+    status.textContent = text;
+    status.className = isError ? "error" : "";
+  }
+
+  function setBusy(busy) {
+    exportBtn.disabled = busy || !target;
+    contextBtn.disabled = busy || !target;
+    typographyBtn.disabled = busy || !target;
+    pickBtn.disabled = busy;
+    folderSelect.disabled = busy;
+  }
+
+  function basename(p) {
+    return p.split("/").filter(Boolean).pop() || p;
+  }
+
+  function renderFolders(recents) {
+    folderSelect.innerHTML = "";
+    if (!recents.length) {
+      const opt = document.createElement("option");
+      opt.textContent = "No folder chosen yet";
+      folderSelect.appendChild(opt);
+      return;
+    }
+    for (const folder of recents) {
+      const opt = document.createElement("option");
+      opt.value = folder;
+      opt.textContent = basename(folder);
+      opt.title = folder;
+      if (folder === target) opt.selected = true;
+      folderSelect.appendChild(opt);
+    }
+  }
+
+  async function refreshConfig() {
+    try {
+      const res = await fetch(
+        BRIDGE + "/config?file=" + encodeURIComponent(fileId || "")
+      );
+      const cfg = await res.json();
+      target = cfg.target;
+      renderFolders(cfg.recentFolders);
+      setBusy(false);
+      if (target) {
+        setStatus("Exports go to " + target + "/design-sync/");
+      } else {
+        setStatus("Choose a project folder to export into.");
+      }
+    } catch (e) {
+      target = null;
+      renderFolders([]);
+      exportBtn.disabled = contextBtn.disabled = typographyBtn.disabled =
+        pickBtn.disabled = folderSelect.disabled = true;
+      setStatus("Bridge not running — in a terminal, run: figma-bridge start — then reopen this plugin.", true);
+    }
+  }
+
+  pickBtn.onclick = async () => {
+    setBusy(true);
+    setStatus("Folder dialog open — pick a project folder…");
+    try {
+      const res = await fetch(BRIDGE + "/pick", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ fileKey: fileId }),
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+    } catch (e) {
+      setStatus("Folder picker failed: " + e.message, true);
+    }
+    await refreshConfig();
+  };
+
+  folderSelect.onchange = async () => {
+    const folder = folderSelect.value;
+    try {
+      const res = await fetch(BRIDGE + "/select", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ folder, fileKey: fileId }),
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+    } catch (e) {
+      setStatus("Could not select folder: " + e.message, true);
+    }
+    await refreshConfig();
+  };
+
+  exportBtn.onclick = () => {
+    setBusy(true);
+    setStatus("Serializing selection…");
+    parent.postMessage({ pluginMessage: { type: "export" } }, "*");
+  };
+
+  contextBtn.onclick = () => {
+    setBusy(true);
+    setStatus("Reading file context (all pages)…");
+    parent.postMessage({ pluginMessage: { type: "context" } }, "*");
+  };
+
+  typographyBtn.onclick = () => {
+    setBusy(true);
+    setStatus("Reading text styles…");
+    parent.postMessage({ pluginMessage: { type: "typography" } }, "*");
+  };
+
+  onmessage = async (event) => {
+    const msg = event.data.pluginMessage;
+    if (!msg) return;
+
+    if (msg.type === "init") {
+      fileId = msg.file.key || msg.file.name;
+      refreshConfig();
+      return;
+    }
+
+    if (msg.type === "error") {
+      setStatus(msg.message, true);
+      setBusy(false);
+      return;
+    }
+
+    if (msg.type === "payload") {
+      setStatus("Sending to bridge…");
+      try {
+        const res = await fetch(BRIDGE + msg.endpoint, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(msg.payload),
+        });
+        let result = null;
+        try {
+          result = await res.json();
+        } catch {}
+        if (!res.ok) {
+          throw new Error((result && result.error) || "Bridge responded " + res.status);
+        }
+        const extras = (result.bootstrap || []).length
+          ? "\nAlso: " + result.bootstrap.join("; ")
+          : "";
+        const n = result.written.length;
+        setStatus(
+          "Done — wrote " + n + (n === 1 ? " file to " : " files to ") +
+            basename(result.target) + "/" + result.dirs.join(", ") + extras
+        );
+        parent.postMessage(
+          { pluginMessage: { type: "done", count: result.written.length } },
+          "*"
+        );
+      } catch (e) {
+        setStatus(
+          e.message.indexOf("fetch") !== -1 || e.name === "TypeError"
+            ? "Could not reach the bridge. In a terminal, run: figma-bridge start — then try again."
+            : "Export failed: " + e.message,
+          true
+        );
+      }
+      setBusy(false);
+    }
+  };
+
+  // Ask the main thread for the file identity; it replies with "init".
+  parent.postMessage({ pluginMessage: { type: "ready" } }, "*");
+</script>

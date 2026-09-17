@@ -1,0 +1,13 @@
+{
+  "name": "figma-bridge",
+  "owner": {
+    "name": "Godwin John"
+  },
+  "plugins": [
+    {
+      "name": "figma-bridge",
+      "source": "./",
+      "description": "Read Figma designs from local exports (design-sync/) instead of the rate-limited REST API or MCP server, and analyze whole Figma files to recommend a build stack and write it into CLAUDE.md."
+    }
+  ]
+}
