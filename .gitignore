@@ -3,3 +3,4 @@ design-sync/
 .DS_Store
 design-sync/
 .vercel
+dist/

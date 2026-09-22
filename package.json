@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "python3 -m http.server 4173",
+    "build": "node scripts/build.mjs",
+    "dev": "npm run build && python3 -m http.server 4173 -d dist",
     "figma:bridge": "node tools/figma-bridge/bin/figma-bridge.mjs start",
     "figma:bridge:plugin:build": "node tools/figma-bridge/bin/figma-bridge.mjs plugin build",
     "figma:bridge:plugin:path": "node tools/figma-bridge/bin/figma-bridge.mjs plugin path"
