@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aomi</title>
+  <link rel="stylesheet" href="/design-tokens/colors.css" />
+  <link rel="stylesheet" href="/design-tokens/typography.css?v=3" />
+  <link rel="stylesheet" href="/node_modules/dialkit/dist/vanilla/styles.css" />
+  <link rel="stylesheet" href="/src/styles.css?v=52" />
+</head>
+
+<body>
+  <main class="app-shell" aria-label="Aomi application shell">
+    <section class="workspace">
+      <header class="title-bar" aria-label="Title bar"></header>
+
+      <section class="chat-container" aria-label="Chat">
+        <div class="chat-inner">
+          <img class="aomi-mark" src="/design-sync/shell-1/assets/frame.svg" width="52" height="52" alt="Aomi" />
+
+          <h1>What should happen on-chain?</h1>
+
+          <div class="suggestion-list" aria-label="Example prompts">
+            <div class="suggestion-row" data-suggestion-row="primary" aria-hidden="true"></div>
+            <div class="suggestion-row suggestion-row-secondary" data-suggestion-row="secondary" aria-hidden="true">
+            </div>
+          </div>
+
+          <section class="chat-stream" aria-label="Conversation" aria-live="polite" hidden>
+            <div class="chat-history">
+            <div class="user-message">
+              Stake 5 ETH with Lido, then use that staked position as collateral on Aave and borrow 1,000 USDC against
+              it
+            </div>
+
+            <p class="collapsed-tasks-hint" hidden>Tap to view details</p>
+
+            <article id="understand-request-details" class="task-card" aria-label="Understand the request"
+              data-history-label="Understood your request" hidden>
+              <header class="task-card-header">
+                <span data-history-text="Understood your request">Understand the request</span>
+                <button class="task-pause-control" type="button" aria-label="Pause task">
+                  <span hidden>Tap to continue</span>
+                  <img src="/design-sync/paused-and-continue-state/assets/pause.svg" alt="" />
+                </button>
+              </header>
+              <div class="task-card-list">
+                <div class="task-card-row">
+                  <img src="/design-sync/step-1/assets/listchecks.svg" alt="" />
+                  <span>Stake 5 ETH with Lido</span>
+                </div>
+                <div class="task-card-row">
+                  <img src="/design-sync/step-1/assets/listchecks-2.svg" alt="" />
+                  <span>Use the staked position as collateral on Aave</span>
+                </div>
+                <div class="task-card-row">
+                  <img src="/design-sync/step-1/assets/listchecks-3.svg" alt="" />
+                  <span>Borrow 1,000 USDC</span>
+                </div>
+              </div>
+            </article>
+
+            <button class="collapsed-task request-understood" type="button"
+              data-history-target="understand-request-details" aria-controls="understand-request-details"
+              aria-expanded="false" hidden>
+              <img src="/design-sync/tasks-collapsed/assets/checkcircle.svg" alt="" />
+              <span>Request understood</span>
+            </button>
+
+            <article id="wallet-details" class="wallet-card" aria-label="Check wallet"
+              data-history-label="Checked wallet" hidden>
+              <header class="wallet-card-header">
+                <span class="wallet-card-title">
+                  <img class="wallet-task-spinner" src="/design-sync/step-2/assets/spinner.svg" alt="" />
+                  <span data-history-text="Checked wallet">Check wallet</span>
+                </span>
+                <button class="task-pause-control" type="button" aria-label="Pause task">
+                  <span hidden>Tap to continue</span>
+                  <img src="/design-sync/paused-and-continue-state/assets/pause.svg" alt="" />
+                </button>
+              </header>
+              <div class="wallet-card-body">
+                <div class="wallet-requirement">
+                  <img src="/design-sync/step-2/assets/info.svg" alt="" />
+                  <span data-history-text="Confirmed wallet had at least 5 ETH plus enough for gas">Confirm wallet has at least 5 ETH plus enough for gas</span>
+                </div>
+                <div class="wallet-balance">
+                  <img src="/design-sync/step-2/assets/frame-3.svg" alt="" />
+                  <span>12.42 ETH</span>
+                </div>
+                <div class="wallet-address">
+                  <img src="/design-sync/step-2/assets/wallet.svg" alt="" />
+                  <span>0x1232...ABC</span>
+                </div>
+              </div>
+            </article>
+
+            <button class="collapsed-task wallet-complete" type="button" data-history-target="wallet-details"
+              aria-controls="wallet-details" aria-expanded="false" hidden>
+              <img src="/design-sync/tasks-collapsed/assets/checkcircle-2.svg" alt="" />
+              <span>Wallet checked</span>
+            </button>
+
+            <article id="plan-details" class="execution-plan history-execution-plan" aria-label="Accepted execution plan" hidden>
+              <div class="execution-plan-content">
+                <header class="execution-plan-header">
+                  <span class="execution-plan-title">Execution plan accepted</span>
+                </header>
+                <div class="execution-plan-list">
+                  <div class="execution-plan-row"><img src="/design-sync/execution-plan/assets/flagbannerfold.svg" alt="" /><span>Stake 5 ETH with Lido to receive stETH.</span></div>
+                  <div class="execution-plan-row"><img src="/design-sync/execution-plan/assets/flagbannerfold-2.svg" alt="" /><span>Supply the resulting stETH to Aave as collateral.</span></div>
+                  <div class="execution-plan-row"><img src="/design-sync/execution-plan/assets/flagbannerfold-3.svg" alt="" /><span>Borrow 1,000 USDC against that position.</span></div>
+                </div>
+              </div>
+            </article>
+
+            <button class="collapsed-task plan-complete" type="button" data-history-target="plan-details"
+              aria-controls="plan-details" aria-expanded="false" hidden>
+              <img src="/design-sync/tasks-collapsed/assets/checkcircle-3.svg" alt="" />
+              <span>Plan accepted</span>
+            </button>
+
+            <article id="stake-details" class="progress-card stake-card" aria-label="Preparing to stake 5 ETH with Lido"
+              data-history-label="Prepared staking 5 ETH with Lido" hidden>
+              <header class="progress-card-header">
+                <span class="progress-card-title">
+                  <img class="progress-spinner" src="/design-sync/step-3/assets/spinner-2.svg" alt="" />
+                  <span class="progress-prefix" data-history-text="Prepared:">Preparing to:</span>
+                  <span>stake 5 ETH with Lido</span>
+                </span>
+                <button class="task-pause-control" type="button" aria-label="Pause task">
+                  <span hidden>Tap to continue</span>
+                  <img src="/design-sync/paused-and-continue-state/assets/pause.svg" alt="" />
+                </button>
+              </header>
+              <div class="progress-card-list">
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/coin.svg" alt="" /><span class="progress-label" data-history-text="Staked">Staking</span><span>5 ETH</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/bank.svg" alt="" /><span class="progress-label">Protocol</span><span>Lido</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/coins.svg" alt="" /><span class="progress-label" data-history-text="Received asset">Expected asset</span><span>stETH</span></div>
+              </div>
+            </article>
+
+            <button class="collapsed-task stake-complete" type="button" data-history-target="stake-details"
+              aria-controls="stake-details" aria-expanded="false" hidden>
+              <img src="/design-sync/tasks-collapsed/assets/checkcircle-4.svg" alt="" />
+              <span>Staked 5 ETH with Lido</span>
+            </button>
+
+            <article id="aave-details" class="progress-card aave-card" aria-label="Preparing Aave position"
+              data-history-label="Prepared Aave position" hidden>
+              <header class="progress-card-header">
+                <span class="progress-card-title">
+                  <img class="progress-spinner" src="/design-sync/step-3/assets/spinner-3.svg" alt="" />
+                  <span class="progress-prefix" data-history-text="Prepared:">Preparing your:</span>
+                  <span>Aave position</span>
+                </span>
+                <button class="task-pause-control" type="button" aria-label="Pause task">
+                  <span hidden>Tap to continue</span>
+                  <img src="/design-sync/paused-and-continue-state/assets/pause.svg" alt="" />
+                </button>
+              </header>
+              <p class="progress-card-description" data-history-text="Aomi prepared the resulting staked ETH position for use as collateral">Aomi is preparing to use the resulting staked ETH position as collateral</p>
+              <div class="progress-card-list">
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/coin-2.svg" alt="" /><span class="progress-label">Asset supplied</span><span>stETH</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/coin-3.svg" alt="" /><span class="progress-label">Estimated amount</span><span>5 stETH</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/bank-2.svg" alt="" /><span class="progress-label">Protocol</span><span>Aave</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/coinvertical.svg" alt="" /><span class="progress-label">Use as collateral</span><span>Yes</span></div>
+              </div>
+            </article>
+
+            <button class="collapsed-task aave-complete" type="button" data-history-target="aave-details"
+              aria-controls="aave-details" aria-expanded="false" hidden>
+              <img src="/design-sync/tasks-collapsed/assets/checkcircle-5.svg" alt="" />
+              <span>Prepared Aave position</span>
+            </button>
+
+            <article id="borrow-details" class="progress-card borrow-card" aria-label="Preparing to borrow 1,000 USDC"
+              data-history-label="Prepared borrowing 1,000 USDC" hidden>
+              <header class="progress-card-header">
+                <span class="progress-card-title">
+                  <img class="progress-spinner" src="/design-sync/step-3/assets/spinner-4.svg" alt="" />
+                  <span class="progress-prefix" data-history-text="Prepared:">Preparing to:</span>
+                  <span>borrow 1,000 USDC</span>
+                </span>
+                <button class="task-pause-control" type="button" aria-label="Pause task">
+                  <span hidden>Tap to continue</span>
+                  <img src="/design-sync/paused-and-continue-state/assets/pause.svg" alt="" />
+                </button>
+              </header>
+              <div class="progress-card-list">
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/handarrowdown.svg" alt="" /><span class="progress-label" data-history-text="Borrowed">Borrow</span><span>1,000 USDC</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/coinvertical-2.svg" alt="" /><span class="progress-label">Collateral</span><span>staked ETH position</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/sealpercent.svg" alt="" /><span class="progress-label">Borrow rate</span><span>4.40%</span></div>
+                <div class="progress-card-row"><img src="/design-sync/step-3/assets/heartbeat.svg" alt="" /><span class="progress-label">Resulting health factor</span><span>10.72</span></div>
+              </div>
+            </article>
+
+            <button class="collapsed-task borrow-complete" type="button" data-history-target="borrow-details"
+              aria-controls="borrow-details" aria-expanded="false" hidden>
+              <img src="/design-sync/tasks-collapsed/assets/checkcircle-6.svg" alt="" />
+              <span>Borrowed 1,000 USDC</span>
+            </button>
+
+            <article class="simulation-card" aria-label="Simulating transaction" hidden>
+              <span class="simulation-title">
+                <img class="simulation-spinner" src="/design-sync/step-3/assets/spinner-5.svg" alt="" />
+                <span>Simulating transaction . . .</span>
+              </span>
+              <span class="simulation-description">Checking whether the proposed execution succeeds before asking for authorization</span>
+            </article>
+
+            <button class="collapsed-task simulation-complete" type="button" data-history-target="simulation-result-details"
+              aria-controls="simulation-result-details" aria-expanded="false" hidden>
+              <img src="/design-sync/tasks-collapsed/assets/checkcircle-7.svg" alt="" />
+              <span>Simulation complete</span>
+            </button>
+
+            <article id="simulation-result-details" class="simulation-result" aria-label="Simulation passed"
+              data-history-label="Simulation passed" hidden>
+              <header class="simulation-result-header">
+                <span class="simulation-passed-badge">
+                  <img src="/design-sync/simulation-passed/assets/checkcircle.svg" alt="" />
+                  <span>Simulation passed</span>
+                </span>
+                <img class="simulation-result-spinner" src="/design-sync/simulation-passed/assets/spinner.svg" alt="" />
+              </header>
+              <div class="simulation-result-list">
+                <div class="simulation-result-row"><span class="simulation-result-label">Expected result:</span><span>1,000 USDC borrowed</span></div>
+                <div class="simulation-result-row"><span class="simulation-result-label">Estimated network cost:</span><span>$0.32</span></div>
+                <div class="simulation-result-row"><span class="simulation-result-label">Resulting position health</span><span>10.72</span></div>
+              </div>
+            </article>
+
+            <article class="transaction-submitted-card" aria-label="Running transaction" hidden>
+              <header class="transaction-submitted-header">
+                <span class="transaction-submitted-title">
+                  <img class="transaction-submitted-spinner" src="/design-sync/transaction-submitted/assets/spinner.svg" alt="" />
+                  <span>Running transaction</span>
+                </span>
+              </header>
+              <div class="transaction-steps" aria-live="polite">
+                <div class="transaction-step" data-transaction-step="0">
+                  <img class="transaction-step-icon" src="/design-sync/transaction-submitted/assets/radiobutton-2.svg" alt="" />
+                  <span>Stake 5 ETH with Lido</span>
+                </div>
+                <div class="transaction-step" data-transaction-step="1">
+                  <img class="transaction-step-icon" src="/design-sync/transaction-submitted/assets/radiobutton-2.svg" alt="" />
+                  <span>Use staked position as Aave collateral</span>
+                </div>
+                <div class="transaction-step" data-transaction-step="2">
+                  <img class="transaction-step-icon" src="/design-sync/transaction-submitted/assets/radiobutton-2.svg" alt="" />
+                  <span>Borrow 1,000 USDC</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="transaction-success-card" aria-label="Transaction successful" hidden>
+              <div class="transaction-success-receipt">
+                <svg class="transaction-success-paper" viewBox="0 0 544 178" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M 12 0 H 532 Q 544 0 544 12 V 176 Q 544 178 542 178 L 540.5 178 C 536.96 178 535.78 166.5 531.64 166.5 C 527.5 166.5 526.32 178 522.77 178 L 515.77 178 C 512.23 178 511.05 166.5 506.91 166.5 C 502.77 166.5 501.59 178 498.04 178 L 491.05 178 C 487.5 178 486.32 166.5 482.18 166.5 C 478.04 166.5 476.86 178 473.32 178 L 466.32 178 C 462.77 178 461.59 166.5 457.45 166.5 C 453.31 166.5 452.14 178 448.59 178 L 441.59 178 C 438.05 178 436.87 166.5 432.73 166.5 C 428.59 166.5 427.41 178 423.86 178 L 416.86 178 C 413.32 178 412.14 166.5 408 166.5 C 403.86 166.5 402.68 178 399.14 178 L 392.14 178 C 388.59 178 387.41 166.5 383.27 166.5 C 379.13 166.5 377.95 178 374.41 178 L 367.41 178 C 363.86 178 362.69 166.5 358.55 166.5 C 354.41 166.5 353.23 178 349.68 178 L 342.68 178 C 339.14 178 337.96 166.5 333.82 166.5 C 329.68 166.5 328.5 178 324.95 178 L 317.96 178 C 314.41 178 313.23 166.5 309.09 166.5 C 304.95 166.5 303.77 178 300.23 178 L 293.23 178 C 289.68 178 288.5 166.5 284.36 166.5 C 280.22 166.5 279.04 178 275.5 178 L 268.5 178 C 264.96 178 263.78 166.5 259.64 166.5 C 255.5 166.5 254.32 178 250.77 178 L 243.77 178 C 240.23 178 239.05 166.5 234.91 166.5 C 230.77 166.5 229.59 178 226.04 178 L 219.05 178 C 215.5 178 214.32 166.5 210.18 166.5 C 206.04 166.5 204.86 178 201.32 178 L 194.32 178 C 190.77 178 189.59 166.5 185.45 166.5 C 181.31 166.5 180.14 178 176.59 178 L 169.59 178 C 166.05 178 164.87 166.5 160.73 166.5 C 156.59 166.5 155.41 178 151.86 178 L 144.86 178 C 141.32 178 140.14 166.5 136 166.5 C 131.86 166.5 130.68 178 127.14 178 L 120.14 178 C 116.59 178 115.41 166.5 111.27 166.5 C 107.13 166.5 105.95 178 102.41 178 L 95.41 178 C 91.86 178 90.69 166.5 86.55 166.5 C 82.41 166.5 81.23 178 77.68 178 L 70.68 178 C 67.14 178 65.96 166.5 61.82 166.5 C 57.68 166.5 56.5 178 52.95 178 L 45.96 178 C 42.41 178 41.23 166.5 37.09 166.5 C 32.95 166.5 31.77 178 28.23 178 L 21.23 178 C 17.68 178 16.5 166.5 12.36 166.5 C 8.22 166.5 7.04 178 3.5 178 L 2 178 Q 0 178 0 176 V 12 Q 0 0 12 0 Z" />
+                  <path class="transaction-success-paper-mobile" d="M 32 0 H 512 Q 544 0 544 13 V 178 L 538.08 178 C 532.08 178 530.08 170 523.08 170 C 516.08 170 514.08 178 508.08 178 L 496.23 178 C 490.23 178 488.23 170 481.23 170 C 474.23 170 472.23 178 466.23 178 L 454.38 178 C 448.38 178 446.38 170 439.38 170 C 432.38 170 430.38 178 424.38 178 L 412.54 178 C 406.54 178 404.54 170 397.54 170 C 390.54 170 388.54 178 382.54 178 L 370.69 178 C 364.69 178 362.69 170 355.69 170 C 348.69 170 346.69 178 340.69 178 L 328.85 178 C 322.85 178 320.85 170 313.85 170 C 306.85 170 304.85 178 298.85 178 L 287 178 C 281 178 279 170 272 170 C 265 170 263 178 257 178 L 245.15 178 C 239.15 178 237.15 170 230.15 170 C 223.15 170 221.15 178 215.15 178 L 203.31 178 C 197.31 178 195.31 170 188.31 170 C 181.31 170 179.31 178 173.31 178 L 161.46 178 C 155.46 178 153.46 170 146.46 170 C 139.46 170 137.46 178 131.46 178 L 119.62 178 C 113.62 178 111.62 170 104.62 170 C 97.62 170 95.62 178 89.62 178 L 77.77 178 C 71.77 178 69.77 170 62.77 170 C 55.77 170 53.77 178 47.77 178 L 35.92 178 C 29.92 178 27.92 170 20.92 170 C 13.92 170 11.92 178 5.92 178 L 0 178 V 13 Q 0 0 32 0 Z" />
+                </svg>
+                <div class="transaction-success-content">
+                  <header class="transaction-success-header">
+                    <span class="transaction-success-badge">
+                      <img src="/design-sync/transaction-successful/assets/checkcircle.svg" alt="" />
+                      <span>Transaction successful</span>
+                    </span>
+                  </header>
+                  <div class="transaction-success-summary">
+                    <span class="transaction-success-chip"><img src="/design-sync/transaction-successful/assets/frame.svg" alt="" />5 ETH staked</span>
+                    <span class="transaction-success-chip">Staked position supplied as collateral on Aave</span>
+                    <span class="transaction-success-chip"><img src="/design-sync/transaction-successful/assets/frame-2.svg" alt="" />1,000 USDC borrowed</span>
+                    <span class="transaction-success-chip">4.40% Current borrow rate</span>
+                    <span class="transaction-success-chip">10.72 Position health</span>
+                  </div>
+                </div>
+              </div>
+              <footer class="transaction-success-actions">
+                <button class="transaction-success-button print-receipt-button" type="button">Print receipt<img src="/design-sync/transaction-successful/assets/receipt.svg" alt="" /></button>
+                <span class="transaction-success-links">
+                  <button class="transaction-success-button view-position-button" type="button">View position</button>
+                  <button class="transaction-success-button view-transaction-button" type="button">View transaction</button>
+                </span>
+              </footer>
+            </article>
+
+            <p class="transaction-completion-summary" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+
+            <div class="working-row" hidden aria-label="Working">
+              <img class="thinking-spinner" src="/design-sync/step-1/assets/frame.svg" alt="" />
+              <span class="thinking-copy" aria-hidden="true">
+                <span class="thinking-word">
+                  <span class="thinking-letter">W</span><span class="thinking-letter">o</span><span
+                    class="thinking-letter">r</span><span class="thinking-letter">k</span><span
+                    class="thinking-letter">i</span><span class="thinking-letter">n</span><span
+                    class="thinking-letter">g</span>
+                  </span><span class="thinking-dots" hidden>.</span>
+              </span>
+            </div>
+
+            <div class="request-prompt-hint" hidden>
+              <img src="/design-sync/accept-request-below-to-continue/assets/arrowfatdown.svg" alt="" />
+              <span>Accept request below to continue</span>
+            </div>
+            </div>
+          </section>
+
+          <form class="composer" id="composer">
+            <div class="composer-default-content">
+              <label class="sr-only" for="prompt">Tell Aomi what should happen on-chain</label>
+              <textarea id="prompt" name="prompt" rows="1"
+                placeholder="Ask Aomi to swap, bridge, send, or deploy . . ."></textarea>
+
+              <div class="composer-footer">
+                <div class="composer-modes">
+                  <button class="mode-button icon-button" type="button" aria-label="Add app, skill, or chain">
+                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M10 4.375v11.25M4.375 10h11.25" fill="none" stroke="currentColor" stroke-linecap="round" />
+                    </svg>
+                  </button>
+                  <button class="mode-button" type="button" aria-label="Complexity: Balanced">
+                    <span class="mode-name"><img src="/design-sync/scale-center/assets/vector.svg" alt="" />Balanced</span>
+                    <img class="caret" src="/design-sync/shell-1/assets/caretdown-2.svg" alt="" />
+                  </button>
+                  <button class="mode-button" type="button" aria-label="Execution mode: Auto">
+                    <span class="mode-name"><img src="/design-sync/sparkle/assets/vector.svg" alt="" />Auto</span>
+                    <img class="caret" src="/design-sync/shell-1/assets/caretdown.svg" alt="" />
+                  </button>
+                </div>
+
+                <button class="send-button" type="submit">
+                  <span>Send</span>
+                  <img src="/design-sync/shell-2/assets/paperplane.svg" alt="" />
+                </button>
+              </div>
+            </div>
+
+            <article class="execution-plan composer-panel" aria-label="Execution plan" hidden>
+              <div class="execution-plan-content composer-panel-content">
+                <header class="execution-plan-header">
+                  <span class="execution-plan-title">Execution plan</span>
+                  <span class="execution-plan-note">Aomi will simulate this plan before asking you to approve it in your wallet.</span>
+                </header>
+
+                <div class="execution-plan-list">
+                  <div class="execution-plan-row">
+                    <img src="/design-sync/execution-plan/assets/flagbannerfold.svg" alt="" />
+                    <span>Stake 5 ETH with Lido to receive stETH.</span>
+                  </div>
+                  <div class="execution-plan-row">
+                    <img src="/design-sync/execution-plan/assets/flagbannerfold-2.svg" alt="" />
+                    <span>Supply the resulting stETH to Aave as collateral.</span>
+                  </div>
+                  <div class="execution-plan-row">
+                    <img src="/design-sync/execution-plan/assets/flagbannerfold-3.svg" alt="" />
+                    <span>Borrow 1,000 USDC against that position.</span>
+                  </div>
+                </div>
+              </div>
+
+              <footer class="execution-plan-actions composer-panel-actions">
+                <button class="plan-button change-plan-button" type="button">
+                  <img src="/design-sync/execution-plan/assets/chatdots.svg" alt="" />
+                  <span>Change plan</span>
+                </button>
+                <span class="plan-decision-buttons">
+                  <button class="plan-button reject-plan-button" type="button">
+                    <img src="/design-sync/execution-plan/assets/x.svg" alt="" />
+                    <span>Reject</span>
+                  </button>
+                  <button class="plan-button accept-plan-button" type="button">
+                    <span>Accept</span>
+                    <img src="/design-sync/execution-plan/assets/check.svg" alt="" />
+                  </button>
+                </span>
+              </footer>
+            </article>
+
+            <article class="approval-card composer-panel" aria-label="Ready for approval" hidden>
+              <div class="approval-card-content composer-panel-content">
+                <header class="approval-card-header">
+                  <img src="/design-sync/transaction-ready-for-approval/assets/cursorclick.svg" alt="" />
+                  <span>Ready for approval</span>
+                </header>
+                <div class="approval-card-list">
+                  <div class="approval-card-row"><span class="approval-execution-icon" aria-hidden="true"></span><span class="approval-label">Execution:</span><span>4 actions · 1 atomic transaction</span></div>
+                  <div class="approval-card-row"><img src="/design-sync/transaction-ready-for-approval/assets/handarrowup.svg" alt="" /><span class="approval-label">You provide:</span><span>5 ETH</span></div>
+                  <div class="approval-card-row"><img src="/design-sync/transaction-ready-for-approval/assets/coin.svg" alt="" /><span class="approval-label">Stake:</span><span>5 ETH → stETH via Lido</span></div>
+                  <div class="approval-card-row"><img src="/design-sync/transaction-ready-for-approval/assets/coinvertical.svg" alt="" /><span class="approval-label">Collateral:</span><span>≈ 5 stETH supplied to Aave</span></div>
+                  <div class="approval-card-row"><img src="/design-sync/transaction-ready-for-approval/assets/handarrowdown.svg" alt="" /><span class="approval-label">Borrow:</span><span>1,000 USDC</span></div>
+                  <div class="approval-card-row"><img src="/design-sync/transaction-ready-for-approval/assets/sealpercent.svg" alt="" /><span class="approval-label">Borrow rate:</span><span>4.40%</span></div>
+                  <div class="approval-card-row"><img src="/design-sync/transaction-ready-for-approval/assets/heartbeat.svg" alt="" /><span class="approval-label">Position health:</span><span>10.72</span></div>
+                  <div class="approval-card-row"><img src="/design-sync/transaction-ready-for-approval/assets/gaspump.svg" alt="" /><span class="approval-label">Estimated network fee:</span><span>$0.32</span></div>
+                </div>
+              </div>
+              <div class="approval-card-footer composer-panel-actions">
+                <div class="approval-actions">
+                  <span class="approval-secondary-actions">
+                    <button class="approval-button cancel-approval-button" type="button">Cancel</button>
+                    <button class="approval-button details-button" type="button">View details<img src="/design-sync/transaction-ready-for-approval/assets/info.svg" alt="" /></button>
+                  </span>
+                  <button class="approval-button approve-sign-button" type="button">Approve transaction<img class="approval-action-icon" src="/design-sync/transaction-ready-for-approval/assets/paperplane.svg" alt="" /></button>
+                </div>
+                <div class="approval-hint" hidden>
+                  <span>Confirm the transaction in your wallet to continue</span>
+                  <img src="/design-sync/step-3/assets/info-3.svg" alt="" />
+                </div>
+              </div>
+            </article>
+          </form>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="wallet-signature-overlay" aria-hidden="true" hidden></div>
+  <section class="wallet-signature-modal" aria-modal="true" aria-labelledby="wallet-signature-title" role="dialog" hidden>
+    <header class="wallet-signature-window-bar">
+      <img class="wallet-signature-window-controls" src="/design-sync/metamask-pop-up-for-signature/assets/frame-51.svg" alt="" />
+      <strong>Metamask</strong>
+    </header>
+    <div class="wallet-signature-account">
+      <img src="/design-sync/metamask-pop-up-for-signature/assets/wallet.svg" alt="" />
+      <span><strong>Account 1</strong><small>Wallet 1 · 0x1232...ABC</small></span>
+      <img class="wallet-signature-info" src="/design-sync/metamask-pop-up-for-signature/assets/info.svg" alt="Connected wallet information" />
+    </div>
+    <main class="wallet-signature-modal-content">
+      <div class="wallet-signature-intro">
+        <h2 id="wallet-signature-title">Transaction request</h2>
+      </div>
+      <section class="wallet-transaction-card wallet-transaction-changes" aria-label="Estimated transaction changes">
+        <header class="wallet-transaction-card-heading">
+          <strong>Estimated changes</strong>
+          <img src="/design-sync/metamask-pop-up-for-signature/assets/info.svg" alt="" />
+        </header>
+        <div class="wallet-transaction-row"><span>You send</span><strong class="wallet-transaction-negative">−5 ETH</strong></div>
+        <div class="wallet-transaction-row"><span>You receive</span><strong>+1,000 USDC</strong></div>
+      </section>
+      <dl class="wallet-transaction-card wallet-transaction-details">
+        <div class="wallet-transaction-row"><dt>Network</dt><dd>Ethereum</dd></div>
+        <div class="wallet-transaction-row"><dt>Request from</dt><dd>Aomi</dd></div>
+      </dl>
+      <section class="wallet-transaction-card wallet-transaction-fee" aria-label="Network fee details">
+        <div class="wallet-transaction-row"><span>Network fee</span><strong>$0.32 · 0.0001 ETH</strong></div>
+        <div class="wallet-transaction-row"><span>Speed</span><strong>Market</strong></div>
+      </section>
+    </main>
+    <footer class="wallet-signature-modal-actions">
+      <button class="wallet-signature-cancel" type="button">Cancel</button>
+      <button class="wallet-signature-confirm" type="button">Confirm</button>
+    </footer>
+  </section>
+
+  <script src="/node_modules/motion/dist/motion.js"></script>
+  <script src="/node_modules/dialkit/dist/vanilla/browser.global.js"></script>
+  <script src="/src/app.js?v=49" defer></script>
+</body>
+
+</html>

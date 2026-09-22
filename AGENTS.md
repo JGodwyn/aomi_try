@@ -6,6 +6,11 @@ Build only the single, mocked end-to-end Lido → Aave transaction flow describe
 in `aomi-product-design-context.md`. It is an interaction study, not a
 redesign or a production onchain product.
 
+## Browser testing
+
+Always use Google Chrome when previewing or testing local websites. Provide the
+user with a localhost URL for every runnable web implementation.
+
 ## Figma source of truth
 
 `design-sync/_file-context/` is the source of truth for the design system.
