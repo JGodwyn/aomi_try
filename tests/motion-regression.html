@@ -1,0 +1,84 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Aomi motion regression</title>
+<h1>Aomi motion regression</h1>
+<pre id="results">Running…</pre>
+<iframe id="preview" title="Aomi preview" width="390" height="760"></iframe>
+<script>
+const output = document.querySelector('#results');
+const frame = document.querySelector('#preview');
+const lines = [];
+const check = (pass, message) => {
+  lines.push(`${pass ? 'PASS' : 'FAIL'} ${message}`);
+  output.replaceChildren(...lines.map(line => { const row = document.createElement('div'); row.textContent = line; return row; }));
+};
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+const nextFrame = w => new Promise(resolve => w.requestAnimationFrame(resolve));
+(async () => {
+  for (const width of [390, 768, 1280]) {
+    frame.width = width;
+    await new Promise(resolve => { frame.onload = resolve; const mode = new URLSearchParams(location.search); frame.src = mode.has('baseline') ? '/tests/baseline.html?state=chat' : mode.has('reduced') ? '/tests/reduced.html?state=chat' : '/?state=chat'; });
+    const w = frame.contentWindow;
+    const d = w.document;
+    if (!w.Motion) throw new Error('Motion runtime not loaded: serve dist, not the repository root');
+    check(true, `${width}: reduced motion = ${w.matchMedia('(prefers-reduced-motion: reduce)').matches}`);
+    const card = d.querySelector('.task-card');
+    w.stopChatAnimations();
+    card.hidden = false;
+    const entrance = w.animateEntrance(card, 0.1);
+    check(Number(w.getComputedStyle(card).opacity) === 0, `${width}: entrance is hidden synchronously, including delay`);
+    await entrance;
+    const exit = w.animateExit(card);
+    await exit;
+    check(Number(w.getComputedStyle(card).opacity) === 0, `${width}: exit retains invisible final frame`);
+    card.hidden = true;
+    w.clearEntranceStyles(card);
+    card.hidden = false;
+    const replay = w.animateEntrance(card);
+    check(Number(w.getComputedStyle(card).opacity) === 0, `${width}: reused card starts invisible`);
+    await replay;
+    check(Number(w.getComputedStyle(card).opacity) === 1, `${width}: reused card finishes visible`);
+    // Closing while opening must continue from the currently painted frame.
+    w.clearEntranceStyles(card);
+    const opening = w.animateHistoryElement(card, true);
+    await wait(80);
+    const before = Number(w.getComputedStyle(card).opacity);
+    const closing = w.animateHistoryElement(card, false);
+    const after = Number(w.getComputedStyle(card).opacity);
+    check(Math.abs(before - after) < 0.02, `${width}: mid-entrance collapse does not jump`);
+    await closing;
+    if (w.animateSurface) {
+      let staleCompletion = false;
+      const cancelled = w.animateEntrance(card);
+      cancelled.then(() => { staleCompletion = true; });
+      cancelled.stop();
+      await wait(550);
+      check(!staleCompletion, `${width}: stopped animation cannot advance the flow`);
+    }
+    // Replay the actual submitted -> receipt transition and sample every frame.
+    w.replayTransactionSuccessTransition();
+    const receipt = d.querySelector('.transaction-success-receipt');
+    const success = d.querySelector('.transaction-success-card');
+    let lastY = -Infinity, minY = 0, reversals = 0, visibleFrames = 0, movingParent = false;
+    const end = performance.now() + 2200;
+    while (performance.now() < end) {
+      await nextFrame(w);
+      if (success.hidden) continue;
+      const transform = w.getComputedStyle(receipt).transform;
+      const y = transform === 'none' ? 0 : new DOMMatrix(transform).m42;
+      if (y < lastY - 0.5) reversals++;
+      minY = Math.min(minY, y);
+      lastY = y;
+      visibleFrames++;
+      movingParent ||= w.getComputedStyle(success).transform !== 'none';
+    }
+    check(minY < -1 || w.matchMedia('(prefers-reduced-motion: reduce)').matches, `${width}: receipt actually travels`);
+    check(visibleFrames > 0 && reversals === 0, `${width}: receipt never jumps backwards (${reversals} reversals)`);
+    check(!movingParent, `${width}: receipt clipping surface stays stationary`);
+    if (w.matchMedia('(prefers-reduced-motion: reduce)').matches) check(minY === 0, `${width}: reduced motion never slides the receipt`);
+    check(Math.abs(lastY) < 0.5, `${width}: receipt finishes at rest`);
+    w.stopChatAnimations();
+  }
+  check(true, 'DONE');
+})().catch(error => { output.textContent += `\nERROR ${error.stack}`; });
+</script>

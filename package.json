@@ -10,7 +10,6 @@
     "figma:bridge:plugin:path": "node tools/figma-bridge/bin/figma-bridge.mjs plugin path"
   },
   "dependencies": {
-    "dialkit": "^2.0.2",
     "motion": "^13.4.0"
   }
 }

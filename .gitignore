@@ -1,6 +1,5 @@
 node_modules/
-design-sync/
+/design-sync/
 .DS_Store
-design-sync/
 .vercel
 dist/

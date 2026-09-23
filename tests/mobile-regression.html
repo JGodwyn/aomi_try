@@ -1,0 +1,84 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Aomi mobile regression</title>
+<h1>Aomi mobile regression</h1>
+<pre id="results">Running…</pre>
+<iframe id="preview" title="Mobile Aomi preview" width="390" height="760"></iframe>
+<script>
+const output = document.querySelector('#results');
+const frame = document.querySelector('#preview');
+const lines = [];
+const check = (pass, message) => {
+  lines.push(`${pass ? 'PASS' : 'FAIL'} ${message}`);
+  output.textContent = lines.join('\n');
+};
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+const nextFrame = w => new Promise(resolve => w.requestAnimationFrame(resolve));
+const load = url => new Promise(resolve => { frame.onload = resolve; frame.src = url; });
+(async () => {
+  for (const width of [320, 390, 412]) {
+    frame.width = width; frame.height = 760;
+    await load('/?state=filled');
+    const w = frame.contentWindow, d = w.document;
+    const fonts = await d.fonts.load('400 16px Geist');
+    await d.fonts.load('400 34px "PT Serif"');
+    check(fonts.length > 0 && fonts.every(font => font.status === 'loaded'), `${width}: real Geist font loaded`);
+    check(w.getComputedStyle(d.querySelector('#prompt')).fontWeight === '400', `${width}: body uses the regular weight`);
+    check(w.getComputedStyle(d.querySelector('.send-button')).webkitTapHighlightColor === 'rgba(0, 0, 0, 0)', `${width}: browser tap highlight disabled`);
+    check(!w.DialKit && !d.querySelector('[src*="dialkit"], [href*="dialkit"]'), `${width}: DialKit removed`);
+    check(d.querySelector('meta[name="viewport"]').content.includes('interactive-widget=resizes-content'), `${width}: Android keyboard resizes content`);
+    const prompt = d.querySelector('#prompt');
+    prompt.focus({preventScroll:true});
+    frame.height = 360;
+    await wait(200);
+    const shell = d.querySelector('.app-shell').getBoundingClientRect();
+    const composer = d.querySelector('.composer').getBoundingClientRect();
+    check(shell.height <= 361 && composer.bottom <= 361 && composer.top >= 0, `${width}: composer remains inside shortened viewport`);
+    prompt.blur(); frame.height = 760;
+    await wait(100);
+    check(Math.abs(d.querySelector('.app-shell').getBoundingClientRect().height - 760) < 1, `${width}: viewport restores after keyboard closes`);
+    w.showUnderstandRequest({animate:false});
+    w.stopChatAnimations();
+    const wallet = d.querySelector('.wallet-card');
+    wallet.hidden = false;
+    const control = wallet.querySelector('.task-pause-control');
+    for (const paused of [false, true]) {
+      w.setPauseControlState(control, paused);
+      const text = wallet.querySelector('.wallet-requirement span').getBoundingClientRect();
+      const balance = wallet.querySelector('.wallet-balance').getBoundingClientRect();
+      check(text.bottom <= balance.top, `${width}: ${paused ? 'paused' : 'running'} wallet wraps without overlap`);
+    }
+    w.showSuccessPreview();
+    await wait(100);
+    const history = d.querySelector('.chat-history');
+    const stream = d.querySelector('.chat-stream');
+    const gap = d.querySelector('.composer').getBoundingClientRect().top - stream.getBoundingClientRect().bottom;
+    check(gap >= 24, `${width}: at least 24px between conversation and chatbar`);
+    // Use a short viewport so the receipt-to-summary scroll must move.
+    frame.height = 600;
+    await wait(100);
+    w.replayTransactionCompletionSummary();
+    await wait(150);
+    w.scrollConversationToLatest();
+    await wait(100);
+    const summary = d.querySelector('.transaction-completion-summary');
+    let previous = history.scrollTop, changes = 0, maxStep = 0;
+    const start = previous;
+    const end = performance.now() + 2100;
+    while (performance.now() < end) {
+      await nextFrame(w);
+      const current = history.scrollTop;
+      if (!summary.hidden && Math.abs(current - previous) > 0.5) {
+        changes++;
+        maxStep = Math.max(maxStep, Math.abs(current - previous));
+      }
+      previous = current;
+    }
+    const travel = history.scrollTop - start;
+    check(changes > 2 && maxStep < travel - 1, `${width}: summary scroll is gradual (${changes} moving frames)`);
+    check(Math.abs(history.scrollHeight - history.clientHeight - history.scrollTop) < 2, `${width}: summary ends fully in view`);
+    w.stopChatAnimations();
+  }
+  check(true, 'DONE');
+})().catch(error => { output.textContent += `\nERROR ${error.stack}`; });
+</script>

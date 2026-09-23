@@ -26,15 +26,15 @@
   --title-sm: 400 14px / 20px var(--font-display);
   --title-sm-letter-spacing: 0;
 
-  --body-lg: 500 16px / 24px var(--font-body);
+  --body-lg: 400 16px / 24px var(--font-body);
   --body-lg-letter-spacing: 0px;
   --body-lg-bold: 600 16px / 24px var(--font-body);
   --body-lg-bold-letter-spacing: 0px;
-  --body-md: 500 14px / 20px var(--font-body);
+  --body-md: 400 14px / 20px var(--font-body);
   --body-md-letter-spacing: 0px;
   --body-md-bold: 700 14px / 20px var(--font-body);
   --body-md-bold-letter-spacing: 0px;
-  --body-sm: 500 10px / 12px var(--font-body);
+  --body-sm: 400 10px / 12px var(--font-body);
   --body-sm-letter-spacing: 0px;
   --body-sm-bold: 700 10px / 12px var(--font-body);
   --body-sm-bold-letter-spacing: 0px;

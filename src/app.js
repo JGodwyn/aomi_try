@@ -118,6 +118,24 @@ const sendButton = document.querySelector(".send-button");
 const sendButtonLabel = sendButton.querySelector("span");
 const sendButtonIcon = sendButton.querySelector("img");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const mobileViewport = window.matchMedia("(max-width: 640px)");
+const appShell = document.querySelector(".app-shell");
+
+function syncMobileViewport() {
+  const viewport = window.visualViewport;
+  if (mobileViewport.matches && viewport && viewport.scale === 1) {
+    appShell.style.height = `${viewport.height}px`;
+    if (document.activeElement === prompt) {
+      // Keep the whole composer, including Send, inside the resized home scroller.
+      composer.scrollIntoView({ block: "nearest", behavior: "instant" });
+    }
+  } else {
+    appShell.style.removeProperty("height");
+  }
+}
+window.visualViewport?.addEventListener("resize", syncMobileViewport);
+window.addEventListener("resize", syncMobileViewport);
+syncMobileViewport();
 
 const defaultMotionValues = {
   composerMovement: {
@@ -205,7 +223,7 @@ const defaultMotionValues = {
   },
 };
 
-let motionValues = defaultMotionValues;
+const motionValues = defaultMotionValues;
 let composerAnimation;
 let responseAnimation;
 let taskAnimation;
@@ -372,56 +390,6 @@ function toMotionTransition(transition, delay = 0) {
   };
 }
 
-function setupDialKit() {
-  if (!window.DialKit) return;
-
-  const kit = window.DialKit.createDialKit(
-    "Summary stream",
-    {
-      delayAfterButtons: [1, 0, 3, 0.1],
-      wordStagger: [0.04, 0, 0.2, 0.005],
-      startingOpacity: [0, 0, 0.9, 0.05],
-      wordFade: {
-        type: "spring",
-        stiffness: 161,
-        damping: 20,
-        mass: 2.6,
-      },
-      replayStream: {
-        type: "action",
-        label: "Replay stream",
-      },
-    },
-    {
-      persist: { key: "aomi-summary-stream-v1" },
-      onAction(action) {
-        if (action === "replayStream") replayTransactionCompletionSummary();
-      },
-    },
-  );
-
-  kit.subscribe((values) => {
-    motionValues = {
-      ...defaultMotionValues,
-      transactionSuccess: {
-        ...defaultMotionValues.transactionSuccess,
-        summary: {
-          delay: values.delayAfterButtons,
-          stagger: values.wordStagger,
-          startingOpacity: values.startingOpacity,
-          transition: values.wordFade,
-        },
-      },
-    };
-  });
-
-  window.DialKit.createDialRoot({
-    position: "top-right",
-    defaultOpen: false,
-    theme: "light",
-  });
-}
-
 function createSuggestionGroup(labels) {
   const group = document.createElement("div");
   group.className = "suggestion-group";
@@ -491,9 +459,14 @@ function syncChatFade() {
   }
 }
 
-function scrollConversationToLatest() {
+// Native smooth scrolling keeps the receipt and summary in the same scroll
+// coordinate system; no height animation or competing transform is needed.
+function scrollConversationToLatest({ smooth = false } = {}) {
   requestAnimationFrame(() => {
-    chatHistory.scrollTop = chatHistory.scrollHeight;
+    chatHistory.scrollTo({
+      top: chatHistory.scrollHeight,
+      behavior: smooth && !reduceMotion.matches ? "smooth" : "instant",
+    });
     syncChatFade();
   });
 }
@@ -533,13 +506,72 @@ function resetTaskHistory({ showHint = false } = {}) {
   clearEntranceStyles(collapsedTasksHint);
 }
 
+// Card surfaces have explicit keyframes; start them synchronously instead of
+// waiting for Motion's asynchronous keyframe resolution. Keep opacity and
+// transform in one native animation so their first/last frames are atomic.
+const surfaceAnimations = new WeakMap();
+
+function animateSurface(element, keyframes, transition) {
+  const previous = surfaceAnimations.get(element);
+  if (previous) {
+    // Retarget a rapid interaction from the frame currently on screen.
+    const current = getComputedStyle(element);
+    for (const property of Object.keys(keyframes)) {
+      keyframes[property] = [current[property], keyframes[property].at(-1)];
+    }
+    previous.stop();
+  }
+
+  for (const [property, values] of Object.entries(keyframes)) {
+    element.style[property] = values[0];
+  }
+  const animation = element.animate(keyframes, {
+    duration: transition.duration * 1000,
+    delay: (transition.delay || 0) * 1000,
+    easing: `cubic-bezier(${transition.ease.join(",")})`,
+    fill: "both",
+  });
+  let stopped = false;
+  let completed = false;
+  const finished = animation.finished.then(() => {
+    if (stopped) return;
+    completed = true;
+    // Write the final frame BEFORE removing the fill effect. Exits remain
+    // invisible until their owner hides them; delayed entrances never flash.
+    for (const [property, values] of Object.entries(keyframes)) {
+      element.style[property] = values.at(-1);
+    }
+    animation.cancel();
+    surfaceAnimations.delete(element);
+  }, () => {});
+  const controls = {
+    then(resolve, reject) {
+      return finished.then(() => { if (!stopped) return resolve?.(); }, reject);
+    },
+    stop() {
+      if (stopped || completed) return;
+      stopped = true;
+      // Snapshot all properties before writing any of them.
+      const current = getComputedStyle(element);
+      const styles = Object.fromEntries(Object.keys(keyframes).map(
+        property => [property, current[property]],
+      ));
+      Object.assign(element.style, styles);
+      animation.cancel();
+      surfaceAnimations.delete(element);
+    },
+  };
+  surfaceAnimations.set(element, controls);
+  return controls;
+}
+
 function animateHistoryElement(element, opening) {
   if (!window.Motion) return undefined;
 
   const config = opening
     ? motionValues.responseEntrance
     : motionValues.understandCollapse;
-  return window.Motion.animate(
+  return animateSurface(
     element,
     reduceMotion.matches
       ? { opacity: opening ? [0, 1] : [1, 0] }
@@ -580,10 +612,10 @@ function expandHistoryItem(item) {
 
 function collapseHistoryItem(item) {
   const { toggle, detail, label } = item;
-  if (!detail.classList.contains("history-detail-card")) return;
+  if (!detail.classList.contains("history-detail-card") ||
+      toggle.getAttribute("aria-expanded") !== "true") return;
+  toggle.setAttribute("aria-expanded", "false");
 
-  taskHistoryAnimations.get(detail)?.stop();
-  clearEntranceStyles(detail);
   const collapseAnimation = animateHistoryElement(detail, false);
   taskHistoryAnimations.set(detail, collapseAnimation);
 
@@ -615,14 +647,14 @@ function animateEntrance(element, delay = 0) {
   }
 
   if (reduceMotion.matches) {
-    return window.Motion.animate(
+    return animateSurface(
       element,
       { opacity: [0, 1] },
       { duration: 0.15, ease: [0.23, 1, 0.32, 1], delay },
     );
   }
 
-  return window.Motion.animate(
+  return animateSurface(
     element,
     {
       opacity: [0, 1],
@@ -644,7 +676,7 @@ function animateExit(element, config = motionValues.understandCollapse) {
   }
 
   if (reduceMotion.matches) {
-    return window.Motion.animate(
+    return animateSurface(
       element,
       { opacity: [1, 0] },
       {
@@ -655,7 +687,7 @@ function animateExit(element, config = motionValues.understandCollapse) {
     );
   }
 
-  return window.Motion.animate(
+  return animateSurface(
     element,
     {
       opacity: [1, 0],
@@ -1080,7 +1112,7 @@ function showTransactionCompletionSummary(
     );
   });
   transactionCompletionSummary.hidden = false;
-  scrollConversationToLatest();
+  scrollConversationToLatest({ smooth: mobileViewport.matches });
 
   transactionCompletionSummaryAnimations =
     transactionCompletionSummaryWords.map((word, index) =>
@@ -1564,7 +1596,8 @@ function showTransactionSuccess(activeSequence, { animate = true } = {}) {
     clearEntranceStyles(transactionSuccessCard);
     clearEntranceStyles(transactionSuccessReceipt);
     clearEntranceStyles(transactionSuccessActions);
-    scrollConversationToLatest();
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    syncChatFade();
 
     if (!animate) {
       showTransactionCompletionSummary(activeSequence, { animate: false });
@@ -1579,17 +1612,14 @@ function showTransactionSuccess(activeSequence, { animate = true } = {}) {
     const transition = reduceMotion.matches
       ? { duration: 0.15, ease: [0.23, 1, 0.32, 1] }
       : toMotionTransition(motionValues.transactionSuccess.transition);
-    transactionSuccessEnterAnimation = window.Motion.animate(
+    transactionSuccessEnterAnimation = animateSurface(
       transactionSuccessCard,
-      reduceMotion.matches
-        ? { opacity: [0, 1] }
-        : {
-            opacity: [0, 1],
-            transform: ["translate3d(0, 4px, 0) scale(0.98)", "translate3d(0, 0, 0) scale(1)"],
-          },
+      // A stationary clip avoids resampling the moving SVG/text at a
+      // changing scale, especially on mobile GPU compositors.
+      { opacity: [0, 1] },
       transition,
     );
-    transactionSuccessReceiptAnimation = window.Motion.animate(
+    transactionSuccessReceiptAnimation = animateSurface(
       transactionSuccessReceipt,
       reduceMotion.matches
         ? { opacity: [0, 1] }
@@ -1598,7 +1628,7 @@ function showTransactionSuccess(activeSequence, { animate = true } = {}) {
         ? { duration: 0.15, ease: [0.23, 1, 0.32, 1] }
         : toMotionTransition(motionValues.transactionSuccess.receipt),
     );
-    transactionSuccessActionsAnimation = window.Motion.animate(
+    transactionSuccessActionsAnimation = animateSurface(
       transactionSuccessActions,
       reduceMotion.matches
         ? { opacity: [0, 1] }
@@ -1632,7 +1662,7 @@ function showTransactionSuccess(activeSequence, { animate = true } = {}) {
   const transition = reduceMotion.matches
     ? { duration: 0.15, ease: [0.23, 1, 0.32, 1] }
     : toMotionTransition(motionValues.transactionSuccess.transition);
-  transactionSuccessExitAnimation = window.Motion.animate(
+  transactionSuccessExitAnimation = animateSurface(
     transactionSubmittedCard,
     reduceMotion.matches
       ? { opacity: [1, 0] }
@@ -2170,13 +2200,13 @@ composer.addEventListener("submit", (event) => {
   event.preventDefault();
   if (composer.classList.contains("is-working")) return;
   if (!prompt.value.trim()) return;
+  prompt.blur();
   prompt.value = filledPrompt;
   userMessage.textContent = filledPrompt;
   showUnderstandRequest();
 });
 
 syncComposer();
-setupDialKit();
 
 const requestedState = new URLSearchParams(window.location.search).get("state");
 

@@ -2,11 +2,17 @@
   box-sizing: border-box;
 }
 
+/* Disable the browser's blue touch overlay; button feedback and focus remain. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html,
 body {
   width: 100%;
   min-width: 0;
   height: 100%;
+  overflow: hidden;
   margin: 0;
   background: var(--color-gray-50);
 }
@@ -196,6 +202,12 @@ h1 {
   color: var(--color-gray-1000);
   font: var(--body-lg);
   letter-spacing: var(--body-lg-letter-spacing);
+}
+
+@media (min-width: 641px) {
+  .user-message {
+    width: min(448px, 100%);
+  }
 }
 
 .working-row {
@@ -439,8 +451,7 @@ h1 {
 
 .task-is-paused .task-card-header,
 .task-is-paused .wallet-card-header,
-.task-is-paused .progress-card-header,
-.task-is-paused .wallet-requirement {
+.task-is-paused .progress-card-header {
   height: 24px;
 }
 
@@ -577,19 +588,22 @@ h1 {
 .wallet-requirement,
 .wallet-balance,
 .wallet-address {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
 }
 
 .wallet-requirement {
   gap: 4px;
-  height: 24px;
+  min-height: 24px;
+  height: auto;
   color: var(--color-bluenight-900);
   font: var(--body-lg);
   letter-spacing: var(--body-lg-letter-spacing);
 }
 
 .wallet-requirement img {
+  flex: 0 0 auto;
   width: 16px;
   height: 16px;
 }
@@ -1799,8 +1813,26 @@ h1 {
     max-width: 100%;
   }
 
+  .chat-inner {
+    min-height: 0;
+  }
+
+  .chat-inner:not(.is-chatting) {
+    justify-content: safe center;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .chat-inner:not(.is-chatting) > * {
+    flex-shrink: 0;
+  }
+
   .chat-inner.is-chatting {
-    gap: 12px;
+    gap: 24px;
+  }
+
+  .chat-history {
+    padding-bottom: 8px;
   }
 
   h1 {
